@@ -1,0 +1,111 @@
+Practical-1: Write a program to implement sentence segmentation and word tokenization
+
+
+#pip intall nltk
+#py -m pip install --upgrade pip 
+
+#nltk.download('punkt') 
+#nltk.download('wordnet')
+
+from nltk.tokenize import word_tokenize 
+text="God is Great! I won a lottery." print("The words are",word_tokenize(text))
+
+from nltk.tokenize import sent_tokenize text="God is Great! I won a lottery." print("The sentences are",sent_tokenize(text))
+
+
+Practical-2: Write a program to Implement stemming and lemmatization
+
+import nltk
+from nltk.stem import WordNetLemmatizer 
+wordnet_lemmatizer = WordNetLemmatizer() 
+text=input("Enter words for Lemmatizing") 
+tokenization= nltk.word_tokenize(text)
+# v verb, a adjective, n noun in lemmatize parameter
+for w in tokenization:
+print("Lemma for {} is {}".format(w,wordnet_lemmatizer.lemmatize(w,'v')))
+
+Practical-3: Write a program to Implement a tri-gram model
+
+import nltk 
+nltk.download('punkt')
+from nltk.tokenize import word_tokenize 
+from nltk import FreqDist
+import pandas as pd
+
+sample = "Hello i am a Person who love about netwoking and Coding and Computer Fundamentals."
+sample_tokens = nltk.word_tokenize(sample) 
+print('\n Sample Tokens:',sample_tokens)
+print('\n Type of Sample Tokens:',type(sample_tokens))
+print('\n Length of Sample Tokens:',len(sample_tokens))
+sample_freq =FreqDist(sample_tokens) 
+tokens=[]
+sf=[]
+for i in sample_freq:
+  tokens.append(i) 
+  sf.append(sample_freq[i])
+df = pd.DataFrame({'Tokens':tokens,'Frequency':sf}) 
+print('\n',df)
+print('\n Bigrams:',list(nltk.bigrams(sample_tokens))) 
+print('\n Trigrams:',list(nltk.trigrams(sample_tokens))) 
+print('\n Ngrams(4):',list(nltk.ngrams(sample_tokens,4)))
+
+Practical-4: Write a program to Implement PoS tagging using HMM & Neural Model
+
+import nltk
+from collections import Counter
+text="Guru(9 is one of the best sites to learn WEB,SAP,Ethical Hacking and much more online." 
+lower_case=text.lower()
+tokens=nltk.word_tokenize(lower_case) 
+tags=nltk.pos_tag(tokens) 
+print(tags) 
+counts=Counter(tag for word,tag in tags)
+for tag in tags:
+  print(tag)
+print(counts)
+fd=nltk.FreqDist(tokens) 
+fd.plot()
+fd1=nltk.FreqDist(counts) 
+fd1.plot()
+
+Practical-5: Write a program to Implementsyntactic parsing of a given text
+
+
+import spacy
+nlp = spacy.load('en_core_web_sm')
+sentence = "Apple is looking at buying U.K. startup for $1 billion"
+doc = nlp(sentence)
+for ent in doc.ents:
+  print(ent.text, ent.start_char, ent.end_char, ent.label_)
+
+  # imports and load spacy english language package
+import spacy
+from spacy import displacy
+from spacy import tokenizer
+nlp = spacy.load('en_core_web_sm')
+#Load the text and process it
+# I copied the text from python wiki
+text =("Python is an interpreted, high-level and general-purpose programming language "
+"Pythons design philosophy emphasizes code readability with"
+"its notable use of significant indentation."
+"Its language constructs and object-oriented approach aim to"
+"help programmers write clear and"
+"logical code for small and large-scale projects")
+# text2 = # copy the paragraphs from https://www.python.org/doc/essays/
+doc = nlp(text)
+#doc2 = nlp(text2)
+sentences = list(doc.sents)
+print(sentences)
+# tokenization
+for token in doc:
+    print(token.text)
+# print entities
+ents = [(e.text, e.start_char, e.end_char, e.label_) for e in doc.ents]
+print(ents)
+# now we use displaycy function on doc2
+displacy.render(doc, style='ent', jupyter=True)
+
+
+
+
+
+Practical-8: Write a program to Implement Text Summarization for the given sample text
