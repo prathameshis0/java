@@ -1,0 +1,826 @@
+import numpy as np
+import pandas as pd
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the Diabetes dataset from sklearn
+diabetes = datasets.load_diabetes()
+
+# Create a DataFrame from the dataset
+diabetes_df = pd.DataFrame(data=diabetes.data, columns=diabetes.feature_names)
+diabetes_df['target'] = diabetes.target
+
+
+# Display basic information about the dataset(EDA)
+print("Dataset Shape:", diabetes_df.shape)
+print("\nColumns:", diabetes_df.columns)
+print("\nInfo:")
+print(diabetes_df.info())
+print("\nNull Values:")
+print(diabetes_df.isnull().sum())
+
+# Display summary statistics of numerical columns
+print("\nSummary Statistics:")
+print(diabetes_df.describe())
+
+# Visualize the distribution of the target variable (diabetes progression)
+plt.figure(figsize=(8, 6))
+sns.histplot(diabetes_df['target'], bins=30, kde=True, color='blue')
+plt.title('Distribution of Diabetes Progression')
+plt.xlabel('Diabetes Progression')
+plt.ylabel('Frequency')
+plt.show()
+
+# Pairplot to visualize relationships between features and the target variable
+plt.figure(figsize=(12, 10))
+sns.pairplot(diabetes_df, diag_kind='kde')
+plt.suptitle("Pairplot of Diabetes Dataset", y=1.02)
+plt.show()
+
+
+# Split the dataset into features (X) and target (y)
+X = diabetes_df.drop('target', axis=1)  # Features
+y = diabetes_df['target']               # Target (continuous variable)
+
+
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+# Initialize the Linear Regression model
+model = LinearRegression()
+
+# Train the model on the training data
+model.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = model.predict(X_test)
+
+# Evaluate the model's performance
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("\nMean Squared Error (MSE):", mse)
+print("R-squared Score:", r2)
+# Plot predicted vs actual values
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred, color='blue')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], linestyle='--', color='red')
+plt.xlabel('Actual Diabetes Progression')
+plt.ylabel('Predicted Diabetes Progression')
+plt.title('Actual vs Predicted (Diabetes Dataset)')
+plt.show()
+
+
+
+
+Practical 02
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Load the Iris dataset from sklearn
+iris = datasets.load_iris()
+
+# Convert the data into a DataFrame
+iris_df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+iris_df['target'] = iris.target
+
+iris_df.shape
+iris_df.info()iris_df.describe()
+
+# EDA: Pairplot to visualize relationships between features
+sns.pairplot(iris_df, hue='target', palette='viridis', diag_kind='hist')
+plt.suptitle("Pairplot of Iris Dataset", y=1.02)
+plt.show()
+
+# Other Plots
+plt.figure(figsize=(12, 6))
+
+# Boxplot
+plt.subplot(1, 2, 1)
+sns.boxplot(x='target', y='sepal length (cm)', data=iris_df)
+plt.title('Boxplot of Sepal Length by Target')
+
+# Violin Plot
+plt.subplot(1, 2, 2)
+sns.violinplot(x='target', y='sepal width (cm)', data=iris_df)
+plt.title('Violin Plot of Sepal Width by Target')
+
+plt.tight_layout()
+plt.show()
+
+# Count Plot (Bar Plot)
+plt.figure(figsize=(8, 5))
+sns.countplot(x='target', data=iris_df, palette='viridis')
+plt.title('Count of Samples by Target')
+plt.xlabel('Target (Species)')
+plt.ylabel('Count')
+plt.xticks(ticks=[0, 1, 2], labels=iris.target_names)
+plt.show()
+
+# Correlation Heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(iris_df.corr(), annot=True, cmap='coolwarm', fmt='.2f', linewidths=1, linecolor='white')
+plt.title('Correlation Heatmap of Iris Features')
+plt.show()
+
+
+
+# Separate features (X) and target (y) from the DataFrame
+X = iris_df.drop('target', axis=1)  # Features
+y = iris_df['target']               # Target (labels)
+
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+# Standardize features by removing the mean and scaling to unit variance
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+
+# Initialize the Logistic Regression model
+model = LogisticRegression()
+
+# Train the model on the training data
+model.fit(X_train, y_train)
+
+# Predict on the test data
+y_pred = model.predict(X_test)
+
+
+# Calculate training and testing accuracy
+train_accuracy = accuracy_score(y_train, model.predict(X_train))
+test_accuracy = accuracy_score(y_test, y_pred)
+
+print("Training Accuracy:", train_accuracy)
+print("Testing Accuracy:", test_accuracy)
+
+# Create a confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:")
+print(conf_matrix)
+
+# Print classification report
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=iris.target_names))
+
+
+# Print probabilities of classification for the first few samples in the test set
+print("\nProbabilities of Classification:")
+probabilities = model.predict_proba(X_test[:5])
+for i, prob in enumerate(probabilities):
+    print(f"Sample {i+1}: {list(zip(iris.target_names, prob))}")
+
+
+Pratical 03
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Load the Iris dataset from sklearn
+iris = datasets.load_iris()
+# Convert the data into a DataFrame
+iris_df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+iris_df['target'] = iris.target
+
+iris_df.shape
+iris_df.columns
+
+iris_df.info()
+iris_df.describe()
+
+# EDA: Pairplot to visualize relationships between features
+sns.pairplot(iris_df, hue='target', palette='viridis', diag_kind='hist')
+plt.suptitle("Pairplot of Iris Dataset", y=1.02)
+plt.show()
+
+# Other Plots
+plt.figure(figsize=(12, 6))
+
+# Boxplot
+plt.subplot(1, 2, 1)
+sns.boxplot(x='target', y='sepal length (cm)', data=iris_df)
+plt.title('Boxplot of Sepal Length by Target')
+
+# Violin Plot
+plt.subplot(1, 2, 2)
+sns.violinplot(x='target', y='sepal width (cm)', data=iris_df)
+plt.title('Violin Plot of Sepal Width by Target')
+
+plt.tight_layout()
+plt.show()
+
+# Count Plot (Bar Plot)
+plt.figure(figsize=(8, 5))
+sns.countplot(x='target', data=iris_df, palette='viridis')
+plt.title('Count of Samples by Target')
+plt.xlabel('Target (Species)')
+plt.ylabel('Count')
+plt.xticks(ticks=[0, 1, 2], labels=iris.target_names)
+plt.show()
+
+# Correlation Heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(iris_df.corr(), annot=True, cmap='coolwarm', fmt='.2f', linewidths=1, linecolor='white')
+plt.title('Correlation Heatmap of Iris Features')
+plt.show()
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Standardize features by removing the mean and scaling to unit variance
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+
+# Initialize the Logistic Regression model
+model = LogisticRegression(multi_class="multinomial")
+
+# Train the model on the training data
+model.fit(X_train, y_train)
+
+# Predict on the test data
+y_pred = model.predict(X_test)
+
+
+# Calculate training and testing accuracy
+train_accuracy = accuracy_score(y_train, model.predict(X_train))
+test_accuracy = accuracy_score(y_test, y_pred)
+
+print("Training Accuracy:", train_accuracy)
+print("Testing Accuracy:", test_accuracy)
+
+# Create a confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:")
+print(conf_matrix)
+
+# Print classification report
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=iris.target_names))
+
+
+# Print probabilities of classification for the first few samples in the test set
+print("\nProbabilities of Classification:")
+probabilities = model.predict_proba(X_test[:5])
+for i, prob in enumerate(probabilities):
+    print(f"Sample {i+1}: {list(zip(iris.target_names, prob))}")
+
+Practical 4
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, accuracy_score
+
+# Load the Iris dataset from sklearn
+iris = datasets.load_iris()
+# Convert the data into a DataFrame
+iris_df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+iris_df['target'] = iris.target
+
+# Exploratory Data Analysis (EDA)
+print(iris_df.describe())  # Summary statistics
+print(iris_df.head())      # View first few rows
+
+# Visualization (pairplot for all features)
+import seaborn as sns
+# EDA: Pairplot to visualize relationships between features
+sns.pairplot(iris_df, hue='target', palette='viridis', diag_kind='hist')
+plt.suptitle("Pairplot of Iris Dataset", y=1.02)
+plt.show()
+
+
+# Separate features (X) and target (y) from the DataFrame
+X = iris_df.drop('target', axis=1)  # Features
+y = iris_df['target']               # Target (labels)
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create the SVM model
+clf = SVC(kernel='linear')  # Experiment with different kernels (e.g., 'rbf')
+
+# Train the model
+clf.fit(X_train, y_train)
+
+# Make predictions on the testing set
+y_pred = clf.predict(X_test)
+
+# Evaluate model performance
+print(classification_report(y_test, y_pred))
+print("Training Accuracy:", accuracy_score(y_train, clf.predict(X_train)))
+print("Testing Accuracy:", accuracy_score(y_test, y_pred))
+
+
+from sklearn.model_selection import GridSearchCV
+# Define a parameter grid to explore
+param_grid = {'kernel': ['linear', 'rbf'],
+              'C': [0.01, 0.1, 1, 10, 100]}
+# Create the GridSearchCV object
+grid_search = GridSearchCV(SVC(), param_grid, cv=5)  # 5-fold cross-validation
+# Fit the grid search to the training data
+grid_search.fit(X_train, y_train)
+# Get the best model and its parameters
+best_model = grid_search.best_estimator_
+best_params = grid_search.best_params_
+print(best_params)
+# Use the best model for prediction and evaluation
+y_pred = best_model.predict(X_test)
+print(classification_report(y_test, y_pred))
+print("Testing Accuracy:", accuracy_score(y_test, y_pred))
+
+
+
+Practical no 5
+
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.datasets import make_moons
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.tree import plot_tree
+
+# Generate moons data
+X, y = make_moons(n_samples=1000, noise=0.3)
+
+# 1. Data Shape and Description
+print("Data Shape:", X.shape)
+print("Description of first 5 rows:")
+print(X[:5])
+print("Description of target variable:")
+print(pd.Series(y).value_counts())  # Convert y to pandas Series
+
+# 2. Check for Missing Values
+import numpy as np
+print("Missing values in features:", np.isnan(X).sum(axis=0))
+
+# 3. Visualize the moons data
+plt.scatter(X[:, 0], X[:, 1], c=y)
+plt.title("Moons Dataset")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.show()
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Define the decision tree classifier
+clf = DecisionTreeClassifier()
+
+
+# Define hyperparameter grid
+param_grid = {
+    'max_depth': [2, 3, 4, 5],
+    'min_samples_split': [2, 5, 10]
+}
+
+# Create GridSearchCV object
+grid_clf = GridSearchCV(clf, param_grid, scoring='accuracy')
+
+# Train the model
+grid_clf.fit(X_train, y_train)
+
+# Get the best model
+best_model = grid_clf.best_estimator_
+
+# Print the best hyperparameters
+print("Best Hyperparameters:", grid_clf.best_params_)
+
+# Predict on test set
+y_pred = best_model.predict(X_test)
+
+# Calculate accuracy
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, y_pred)
+print("Test Accuracy:", accuracy)
+
+# Visualize the decision tree
+plot_tree(best_model)
+plt.show()
+
+Practical No 6
+import pandas as pd
+from sklearn.datasets import fetch_california_housing
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVR
+from sklearn.metrics import mean_squared_error, r2_score
+import seaborn as sns  # For visualization
+import matplotlib.pyplot as plt  # For visualization
+
+# Load data
+data = fetch_california_housing()
+X = pd.DataFrame(data.data, columns=data.feature_names)
+y = data.target
+
+
+X.columns
+y
+
+# Print basic info about the data
+print(X.describe())  # Summary statistics
+print(X.head())      # View first few rows
+
+# Check for missing values
+print("Missing values:", X.isnull().sum())
+
+
+# Exploratory Data Analysis (EDA)
+# Visualize the distribution of the target variable (median house value)
+sns.distplot(y)
+plt.xlabel("Median House Value")
+plt.ylabel("Density")
+plt.title("Distribution of Median House Values")
+plt.show()
+
+# Data Preprocessing
+# Scale features (SVM regressor is sensitive to feature scales)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split Data into Training and Testing Sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Train the SVM Regressor
+svr = SVR(kernel='rbf')  # Experiment with 'linear' or other kernels
+svr.fit(X_train, y_train)
+
+# Make Predictions and Evaluate Performance
+y_pred = svr.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Mean Squared Error:", mse)
+print("R-squared:", r2)
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVR
+
+
+
+# Define a parameter grid to explore
+param_grid = {
+    'kernel': ['linear', 'rbf'],  # Experiment with different kernels
+    'C': [0.01, 0.1, 1, 10, 100],  # Regularization parameter
+    'gamma': [0.001, 0.01, 0.1, 1],  # Gamma for RBF kernel (optional)
+}
+
+# Create the GridSearchCV object
+grid_search = GridSearchCV(SVR(), param_grid, cv=5)  # 5-fold cross-validation
+
+# Fit the grid search to the training data
+grid_search.fit(X_train, y_train)
+
+# Get the best model and its parameters
+best_model = grid_search.best_estimator_
+best_params = grid_search.best_params_
+
+# Use the best model for prediction and evaluation
+y_pred = best_model.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Mean Squared Error:", mse)
+print("R-squared:", r2)
+print("Best Hyperparameters:", best_params)
+
+Pratical No 7
+import numpy as np
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
+
+# Load the Iris dataset
+iris = datasets.load_iris()
+X = iris.data
+y = iris.target
+
+# Standardize the features
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+# Add a bias term (column of ones) to the data
+X = np.c_[np.ones(X.shape[0]), X]
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+def softmax(logits):
+    exp_logits = np.exp(logits - np.max(logits, axis=1, keepdims=True))
+    return exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
+
+def compute_loss_and_gradients(X, y, theta):
+    logits = X.dot(theta)
+    y_proba = softmax(logits)
+    m = X.shape[0]
+    entropy_loss = -np.mean(np.log(y_proba[np.arange(m), y]))
+    gradients = (1/m) * X.T.dot(y_proba - np.eye(np.max(y) + 1)[y])
+    return entropy_loss, gradients
+
+def predict(X, theta):
+    logits = X.dot(theta)
+    return np.argmax(softmax(logits), axis=1)
+
+
+def softmax_regression(X_train, y_train, X_val, y_val, learning_rate=0.01, n_epochs=1000, tol=1e-4, patience=5):
+    n_inputs = X_train.shape[1]
+    n_outputs = np.max(y_train) + 1
+    theta = np.random.randn(n_inputs, n_outputs)
+    
+    best_loss = np.inf
+    epochs_without_improvement = 0
+    
+    for epoch in range(n_epochs):
+        loss, gradients = compute_loss_and_gradients(X_train, y_train, theta)
+        theta = theta - learning_rate * gradients
+        
+        val_loss, _ = compute_loss_and_gradients(X_val, y_val, theta)
+        
+        if val_loss < best_loss - tol:
+            best_loss = val_loss
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
+            
+        if epochs_without_improvement >= patience:
+            print(f"Early stopping at epoch {epoch}")
+            break
+            
+    return theta
+
+# Split the training data into training and validation sets
+X_train_split, X_val_split, y_train_split, y_val_split = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+
+# Train the model
+theta = softmax_regression(X_train_split, y_train_split, X_val_split, y_val_split)
+
+
+Practical No 8
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+import matplotlib.pyplot as plt
+
+# Load and preprocess the MNIST dataset
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+print(x_train.shape)
+x_train = x_train / 255.0
+x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
+
+# Define the CNN model architecture
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    MaxPooling2D((2, 2)),
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dense(10, activation='softmax')
+])
+
+# Compile the model
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Train the model using the training data
+model.fit(x_train, y_train, epochs=5)
+
+# Choose a single image from the test set
+index = 0  # Replace with the index of the image you want to use
+single_image = x_test[index]
+input_image = np.expand_dims(single_image, axis=0)
+
+# Get the predicted probabilities for the single image
+predicted_probabilities = model.predict(input_image)
+
+# Display the input image
+plt.imshow(single_image, cmap='gray')
+plt.title('Input Image')
+plt.axis('off')
+plt.show()
+
+# Display the predicted probabilities
+print("Predicted Probabilities:", predicted_probabilities)
+
+# Get the predicted class (index with highest probability)
+predicted_class = np.argmax(predicted_probabilities)
+print("Predicted Class:", predicted_class)
+
+Practical 9
+
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
+import matplotlib.pyplot as plt
+
+# Load the Fashion MNIST dataset
+(train_images, train_labels), (test_images, test_labels) = datasets.fashion_mnist.load_data()
+
+# Normalize the images to a range of 0 to 1
+train_images, test_images = train_images / 255.0, test_images / 255.0
+
+
+model = models.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.Flatten(),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+# Reshape the data to include the channel dimension
+train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
+test_images = test_images.reshape((test_images.shape[0], 28, 28, 1))
+
+# Train the model
+history = model.fit(train_images, train_labels, epochs=10, validation_data=(test_images, test_labels))
+
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+plt.plot(history.history['accuracy'], label='Training Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.title('Accuracy')
+
+plt.subplot(1, 2, 2)
+plt.plot(history.history['loss'], label='Training Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Loss')
+
+plt.show()
+
+Pratical no 10
+
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras import layers, models
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+
+# Load the dataset
+url = "auto-mpg.csv"  # Replace with your CSV file path
+column_names = ['MPG', 'Cylinders', 'Displacement', 'Horsepower', 'Weight', 'Acceleration', 'Model Year', 'Origin']
+dataset = pd.read_csv(url, names=column_names, na_values='?', comment='\t', sep=',', skipinitialspace=True)
+
+dataset.info()
+
+
+# Drop rows with missing values
+dataset = dataset.dropna()
+
+# Convert columns to appropriate numeric data types
+for column in ['MPG', 'Cylinders', 'Displacement', 'Horsepower', 'Weight', 'Acceleration', 'Model Year']:
+    dataset[column] = pd.to_numeric(dataset[column], errors='coerce')
+
+# Check for NaN values in the dataset
+print("NaN values before dropping: \n", dataset.isnull().sum())
+
+# Drop any rows with NaN values
+dataset = dataset.dropna()
+
+# Check again for NaN values to confirm
+print("NaN values after dropping: \n", dataset.isnull().sum())
+
+# Convert 'Origin' to string for one-hot encoding
+dataset['Origin'] = dataset['Origin'].astype(str)
+
+# Convert categorical 'Origin' column to one-hot encoding
+dataset = pd.get_dummies(dataset, columns=['Origin'], prefix='', prefix_sep='')
+
+
+# Split the dataset into training and testing sets
+train_dataset, test_dataset = train_test_split(dataset, test_size=0.2, random_state=42)
+
+# Separate features and labels
+train_features = train_dataset.copy()
+test_features = test_dataset.copy()
+train_labels = train_features.pop('MPG')
+test_labels = test_features.pop('MPG')
+
+# Check for NaN values in the dataset
+assert not train_features.isnull().any().any(), "There are NaN values in the training features"
+assert not test_features.isnull().any().any(), "There are NaN values in the test features"
+assert not train_labels.isnull().any(), "There are NaN values in the training labels"
+assert not test_labels.isnull().any(), "There are NaN values in the test labels"
+
+# Normalize the features
+scaler = StandardScaler()
+train_features = scaler.fit_transform(train_features)
+test_features = scaler.transform(test_features)
+
+def build_model():
+    model = models.Sequential([
+        layers.Dense(64, activation='relu', input_shape=[train_features.shape[1]]),
+        layers.Dense(64, activation='relu'),
+        layers.Dense(1)
+    ])
+    return model
+
+model = build_model()
+
+model.compile(optimizer='adam',
+              loss='mse',
+              metrics=['mae', 'mse'])
+history = model.fit(train_features, train_labels, 
+                    epochs=100, validation_split=0.2, verbose=0)
+
+# Plot training history
+hist = pd.DataFrame(history.history)
+hist['epoch'] = history.epoch
+
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+plt.xlabel('Epoch')
+plt.ylabel('Mean Abs Error [MPG]')
+plt.plot(hist['epoch'], hist['mae'], label='Train Error')
+plt.plot(hist['epoch'], hist['val_mae'], label='Val Error')
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.xlabel('Epoch')
+plt.ylabel('Mean Square Error [MPG^2]')
+plt.plot(hist['epoch'], hist['mse'], label='Train Error')
+plt.plot(hist['epoch'], hist['val_mse'], label='Val Error')
+plt.legend()
+
+plt.show()
+
+
+test_loss, test_mae, test_mse = model.evaluate(test_features, test_labels, verbose=2)
+print(f'\nTest MAE: {test_mae:.2f} MPG')
+
+
+test_predictions = model.predict(test_features).flatten()
+
+plt.scatter(test_labels, test_predictions)
+plt.xlabel('True Values [MPG]')
+plt.ylabel('Predictions [MPG]')
+plt.axis('equal')
+plt.axis('square')
+plt.plot([-100, 100], [-100, 100])
+plt.show()
+
+error = test_predictions - test_labels
+plt.hist(error, bins=25)
+plt.xlabel('Prediction Error [MPG]')
+plt.ylabel('Count')
+plt.show()
+
+
+
+# Print predicted vs actual values
+print("\nPredicted vs Actual MPG values:")
+for predicted, actual in zip(test_predictions, test_labels):
+    print(f"Predicted: {predicted:.2f}, Actual: {actual:.2f}")
