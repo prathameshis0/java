@@ -1,0 +1,194 @@
+-->Practical no 1: Implement basics embedded circuits.
+i:Alarm system
+Siren,DLC,Motion Detector,Door,SmartPhone
+
+condition:
+1)motion on is true  |
+2)siren on is false  | --> Set siren ON to true
+3)Door lock is lock  |
+
+1)siren on is true    |
+2)motion on is false  | ---> set siren on to false
+3)Door open is false  |
+
+ii)Toggle Button
+Program Code:
+from gpio import *;
+from time import *;
+
+pinMode(0,INPUT);
+pinMode(0,OUTPUT);
+while True:
+	if digitalRead(0)==HIGH:
+		sleep(3)
+		digitalWrite(1,1023)
+	else:
+		digitalWrite(1,0)
+
+iii) Sensor based Counter(MCU,TRIPWIRE)
+Program
+from gpio import *;
+from time import *
+count=0
+
+pinMode(0,INPUT)
+pinMode(0,OUTPUT)
+while True:
+	if digitalRead(0)==HIGH:
+		count=count+2
+		print("Counting "+str(count))
+		sleep(.3)
+
+
+-->Practical 03:send ticket before entering
+(LCD,MCU,RFID,gateway,DOOR,PC)
+MCU:
+from gpio import *
+from time import *
+from ioeclient import IoEClient
+
+def main():
+	pinMode(0,OUT)
+	pinMode(0,IN)
+	while True:
+		customWrite(0,"Waiting");
+		rfid=analogRead(A1)
+		if(rfid==0):
+			customWrite(0,"Success")
+		
+		delay(3000)
+
+if __name__=="__main__":
+	main()
+	
+RFID:
+in loop() below sendReport()
+if cardID=='1001':
+     	setState(0)
+    else:
+    	setState(1)	
+
+
+
+
+
+-->Practical 5:
+rain sensor
+
+LCD,MCU,humiture sensor
+
+code:
+function getSensorData(){
+	return Math.floor(map(analogRead(A0),0,1023,0,100)+0.5)
+}
+
+function setup() {
+	
+	attachInterrupt(A0,function(){
+	processData(getSensorData());	
+	});
+}
+function processData(data)
+{
+	if(data>90){
+		customWrite(0,data+" Going to rain");
+	}else{
+		customWrite(0,data+ "No rain");
+	}
+}
+
+
+-->Practical 7:
+water level
+water sensor,lawn sprinkler,muc,motor,water Tank
+code:
+from gpio import *
+from time import *
+
+while True:
+	water_level=analogRead(A0)
+	if water_level<400:
+		digitalWrite(A1,HIGH)
+	else:
+		digitalWrite(A1,LOW)
+		sleep(0.3)
+
+-->Practical no 8
+motion Detection.
+motion sensor,MCU,Alarm
+
+code:
+function setup() {
+	pinMode(0, OUTPUT);
+	pinMode(1,OUTPUT);
+}
+
+function loop() {
+	var motion=digitalRead(0);
+	Serial.println(motion);
+	if(motion==1023){
+		digitalWrite(1,HIGH);
+	}else{
+		digitalWrite(1,LOW);
+	}
+}
+
+-->Practical no 2
+UART port
+
+switch,mcu(80c51),ground,LED.
+mcu1(pin1)--switch,pin21--mcu2(pin1),pin21--LED
+
+in kiel select Intel(8051AH)
+tx.c
+#include<reg51.h>
+sbit sw=P1^0;
+sbit outPin=P2^0;
+
+void main(void){
+while(1){
+if(sw==0){
+	outPin=1;
+}else{
+	outPin=0;
+}
+}
+}
+
+rx.c
+#include<reg51.h>
+sbit Inpin=P1^0;
+sbit led=P2^0;
+
+void main(void){
+while(1){
+if(Inpin==1){
+led=1;
+}else{
+led=0;
+}
+}
+}
+
+
+--> no 6(intensity of light)
+UNO r3v1.0,Power supply,LCD(LM016L),torch&LDR, resistor(1k).
+uno pinA0--ldr,unopin(7,6)--lcd(4,6),uno(5,4,3,2)--lcd(D4,D5,D6,D7).
+code:
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(7,6,5,4,3,2);
+
+void setup(){
+	lcd.begin(16,2);
+	lcd.setCursor(1,0);
+	lcd.print("LDR OUT=");
+	lcd.setCursor(1,1);
+	lcd.print("Light Intensity");
+}
+void loop(){
+	int ldr=analogRead(A0);
+	lcd.setCursor(10,0);
+	lcd.print(ldr);
+}
+
