@@ -697,6 +697,44 @@ plt.title('Loss')
 
 plt.show()
 
+import numpy as np
+predictions=model.predict(test_images)
+def plot_images(prediction_arr,true_label,img):
+  plt.grid(False)
+  plt.xticks([])
+  plt.yticks([])
+  plt.imshow(img,cmap=plt.cm.binary)
+  predicted_label=np.argmax(prediction_arr)
+  if predicted_label==true_label:
+    color='blue'
+  else:
+    color='red'
+  plt.xlabel('{} {:2.0f}% ({})'.format(class_names[predicted_label],100*np.max(prediction_arr),class_names[true_label]),color=color)
+
+def plot_value_array(prediction_arr,true_label):
+  plt.grid(False)
+  plt.xticks(range(10))
+  plt.yticks([])
+  thisplot=plt.bar(range(10),prediction_arr,color='#777777')
+  plt.ylim([0,1])
+  predicted_label=np.argmax(prediction_arr)
+  thisplot[predicted_label].set_color('red')
+  thisplot[true_label].set_color('blue')
+
+class_names=['T-shirt/top','Trouser','Pullover','Dress','Coat','Sandal','Shirt','Sneaker','Bag','Ankle boot']
+num_rows=5
+num_cols=3
+num_images=num_rows*num_cols
+plt.figure(figsize=(2*2*num_cols,2*num_rows))
+
+for i in range(num_images):
+  plt.subplot(num_rows,2*num_cols,2*i+1)
+  plot_images(predictions[i],test_labels[i],test_images[i].reshape(28,28))
+  plt.subplot(num_rows,2*num_cols,2*i+2)
+  plot_value_array(predictions[i],test_labels[i])
+plt.tight_layout()
+plt.show()
+
 Pratical no 10
 
 import pandas as pd
