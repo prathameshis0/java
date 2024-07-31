@@ -79,7 +79,7 @@ plt.show()
 
 
 
-Practical 02
+-->Practical 02
 
 import numpy as np
 import pandas as pd
@@ -188,7 +188,7 @@ for i, prob in enumerate(probabilities):
     print(f"Sample {i+1}: {list(zip(iris.target_names, prob))}")
 
 
-Pratical 03
+-->Pratical 03
 
 import numpy as np
 import pandas as pd
@@ -290,7 +290,7 @@ probabilities = model.predict_proba(X_test[:5])
 for i, prob in enumerate(probabilities):
     print(f"Sample {i+1}: {list(zip(iris.target_names, prob))}")
 
-Practical 4
+-->Practical 4
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -360,7 +360,7 @@ print("Testing Accuracy:", accuracy_score(y_test, y_pred))
 
 
 
-Practical no 5
+-->Practical no 5
 
 
 import matplotlib.pyplot as plt
@@ -428,7 +428,7 @@ print("Test Accuracy:", accuracy)
 plot_tree(best_model)
 plt.show()
 
-Practical No 6
+-->Practical No 6
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
 from sklearn.preprocessing import StandardScaler
@@ -516,7 +516,7 @@ print("Mean Squared Error:", mse)
 print("R-squared:", r2)
 print("Best Hyperparameters:", best_params)
 
-Pratical No 7
+-->Pratical No 7
 import numpy as np
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
@@ -589,7 +589,7 @@ X_train_split, X_val_split, y_train_split, y_val_split = train_test_split(X_trai
 theta = softmax_regression(X_train_split, y_train_split, X_val_split, y_val_split)
 
 
-Practical No 8
+-->Practical No 8
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist
@@ -643,7 +643,7 @@ print("Predicted Probabilities:", predicted_probabilities)
 predicted_class = np.argmax(predicted_probabilities)
 print("Predicted Class:", predicted_class)
 
-Practical 9
+-->Practical 9
 
 import tensorflow as tf
 from tensorflow.keras import datasets, layers, models
