@@ -1,0 +1,165 @@
+DV practical 
+1. Charts and reports
+      i)Stacked chart
+        Drag "subcategory" into x and  "sales"     into y ,"region' into legend.
+       ii)pie chart
+         Drag "region" into legend, sales into      values.
+
+
+2. Time function
+     Create a measure  calculation of previous year sales and profit.
+      PreviousYearProfit=CALCULATION (SUM(Orders[Profit]), PERVIOUSYEAR(Orders[OrderDate].[Date]))
+Same for PreviousYearSales.
+
+
+
+4. Create one dimension data using series and  perform various operations on it
+import pandas as pd
+import numpy as np
+
+# Creating a Pandas Series
+data = [10, 20, 30, 40, 50]
+series = pd.Series(data)
+
+# Displaying the created series
+print("Original Series:")
+print(series)
+
+# Accessing elements
+print("\nAccessing elements at index 2 and 4:")
+print(f"Element at index 2: {series[2]}")
+print(f"Element at index 4: {series[4]}")
+
+# Mathematical Operations
+print("\nMathematical Operations:")
+
+# Adding a constant to each element
+print(f"Adding 5 to each element:\n{series + 5}")
+
+# Subtracting a constant from each element
+print(f"Subtracting 10 from each element:\n{series - 10}")
+
+# Multiplying each element by 2
+print(f"Multiplying each element by 2:\n{series * 2}")
+
+# Dividing each element by 5
+print(f"Dividing each element by 5:\n{series / 5}")
+
+# Applying a mathematical function (Square)
+print(f"Square of each element:\n{series**2}")
+
+# Aggregation Operations
+print("\nAggregation Operations:")
+
+# Sum of all elements
+print(f"Sum of elements: {series.sum()}")
+
+# Mean of the elements
+print(f"Mean of elements: {series.mean()}")
+
+# Minimum element
+print(f"Minimum element: {series.min()}")
+
+# Maximum element
+print(f"Maximum element: {series.max()}")
+
+# Indexing and Slicing
+print("\nIndexing and Slicing:")
+
+# Slicing elements from index 1 to 3
+print(f"Slicing from index 1 to 3:\n{series[1:4]}")
+
+# Selecting a specific element with condition (greater than 20)
+print(f"Elements greater than 20:\n{series[series > 20]}")
+
+# Applying a custom function
+print("\nApplying Custom Function:")
+
+# Define a custom function to subtract 3 from each element
+def subtract_three(x):
+    return x - 3
+
+# Applying the function to each element
+print(f"Subtracting 3 from each element using custom function:\n{series.apply(subtract_three)}")
+
+# Sorting the elements
+print("\nSorting the elements in ascending order:")
+print(series.sort_values())
+
+# Checking for NaN values (No NaN here, but can be tested for)
+print("\nChecking for NaN values:")
+print(series.isna())
+
+
+5. Perform reshaping of the hierarchy data and pivoting data frame data.
+ 
+import pandas as pd
+import numpy as np
+
+# Create a sample DataFrame for demonstration
+data = {
+'Date': ['2024-01-01', '2024-01-01', '2024-01-02', '2024-01-02', '2024-01-03', '2024-01-03'],
+'City': ['New York', 'Los Angeles', 'New York', 'Los Angeles', 'New York', 'Los Angeles'],
+    'Temperature': [32, 75, 30, 72, 28, 70],
+    'Humidity': [80, 10, 85, 15, 90, 12]
+}
+
+# Create DataFrame
+df = pd.DataFrame(data)
+print("Original DataFrame:")
+print(df)
+
+# =====================================================
+# 1. Pivoting DataFrame using pivot()
+# =====================================================
+
+# Pivot the DataFrame to reshape it, setting 'Date' as index and 'City' as columns
+pivot_df = df.pivot(index='Date', columns='City', values=['Temperature', 'Humidity'])
+print("\nPivoted DataFrame:")
+print(pivot_df)
+
+# =====================================================
+# 2. Pivoting DataFrame using pivot_table() with aggregation
+# =====================================================
+
+# Use pivot_table() to aggregate the data if multiple values exist for the same index/column combination
+# In this case, we'll use mean aggregation to handle duplicate combinations
+data_agg = {
+    'Date': ['2024-01-01', '2024-01-01', '2024-01-02', '2024-01-02', '2024-01-03', '2024-01-03'],
+    'City': ['New York', 'New York', 'Los Angeles', 'Los Angeles', 'New York', 'New York'],
+    'Temperature': [32, 35, 72, 74, 28, 30],
+    'Humidity': [80, 78, 15, 18, 90, 92]
+}
+df_agg = pd.DataFrame(data_agg)
+
+pivot_table_df = df_agg.pivot_table(index='Date', columns='City', values=['Temperature', 'Humidity'], aggfunc='mean')
+print("\nPivot Table DataFrame (with aggregation):")
+print(pivot_table_df)
+
+# =====================================================
+# 3. Melting DataFrame (Unpivoting)
+# =====================================================
+
+# Melt the DataFrame to long format, turning columns into rows
+melted_df = df.melt(id_vars=['Date', 'City'], value_vars=['Temperature', 'Humidity'],
+                    var_name='Metric', value_name='Value')
+print("\nMelted DataFrame:")
+print(melted_df)
+
+# =====================================================
+# 4. Stacking and Unstacking DataFrame (Hierarchical Reshaping)
+# =====================================================
+
+# First, set 'Date' and 'City' as a MultiIndex for hierarchical structure
+df_stacked = df.set_index(['Date', 'City'])
+
+# Stack the DataFrame (compress columns into a single column level)
+stacked_df = df_stacked.stack()
+print("\nStacked DataFrame (Hierarchical):")
+print(stacked_df)
+
+# Unstack the DataFrame (reverse stacking, expand index back into columns)
+unstacked_df = stacked_df.unstack()
+print("\nUnstacked DataFrame (Reverted to original columns):")
+print(unstacked_df)
+
