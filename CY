@@ -15,14 +15,16 @@
 Then open firefox type ip
      By scanning http-trace go to /phpMyAdmin, /phpinfo page
 
+nikto -h <target> -p 80 -Plugins "apacheusers(enumerate,dictionary:user.txt);report_xml" -output apacheuser.xml
     Owasp zap
+     sudo apt install zaproxy
     Using wpscan --url.      https:blogs.overandall.com
 
 
 5. Using social engineering toolkit
      Sudo setoolkit
 
-
+6. wafw00f www.hdfc.com
 
 7.using metasploit Framework for exploitation 
 
