@@ -1,0 +1,725 @@
+practical 1
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+import numpy as np
+
+(x_train,y_train),(x_test,y_test)=keras.datasets.mnist.load_data()
+x_train,x_test=x_train/255.0,x_test/255.0
+
+model=keras.Sequential([
+    layers.Flatten(input_shape=(28,28)),
+    layers.Dense(256,activation='relu',kernel_regularizer=keras.regularizers.l2(0.001)),
+    layers.Dropout(0.3),
+    layers.Dense(128,activation='relu',kernel_regularizer=keras.regularizers.l2(0.001)),
+    layers.Dropout(0.3),
+    layers.Dense(10,activation='softmax')
+])
+
+# Compile the Model
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=10, 
+          validation_data=(x_test, y_test), batch_size=128)
+
+# Evaluate the Model
+test_loss, test_acc = model.evaluate(x_test, y_test)
+print(f"Test Accuracy: {test_acc:.4f}")
+
+#early stopping
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.callbacks import EarlyStopping
+
+(x_train,y_train),(x_test,y_test)=keras.datasets.mnist.load_data()
+x_train,x_test=x_train/255.0,x_test/255.0
+
+model=keras.Sequential([
+    layers.Flatten(input_shape=(28,28)),
+    layers.Dense(256,activation='relu',kernel_regularizer=keras.regularizers.l2(0.001)),
+    layers.Dropout(0.3),
+    layers.Dense(128,activation='relu',kernel_regularizer=keras.regularizers.l2(0.001)),
+    layers.Dropout(0.3),
+    layers.Dense(10,activation='softmax')
+])
+
+# Compile the Model
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+early_stopping=EarlyStopping(
+    monitor='val_loss',
+    patience=3,
+    restore_best_weights=True
+)
+
+history=model.fit(x_train,y_train,epochs=50,batch_size=128,validation_data=(x_test,y_test),callbacks=[early_stopping])
+
+# Evaluate the Model
+test_loss, test_acc = model.evaluate(x_test, y_test)
+print(f"Test Accuracy: {test_acc:.4f}")
+
+
+--------------------------------------------------------------------------------
+
+
+practical No 2
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+(x_train,y_train),(x_test,y_test)=keras.datasets.mnist.load_data()
+x_train,x_test=x_train.reshape(-1,28*28)/255.0,x_test.reshape(-1,28*28)/255.0
+
+X_train,X_val,y_train_split,y_val_split=train_test_split(x_train,y_train,test_size=0.2,random_state=42)
+
+param_grid={
+    "neurons":[64,128],
+    "activation":['relu','tanh'],
+    "optimizer":['adam','sgd'],
+    "batch_size":[64],
+    "epochs":[5]
+}
+best_acc=0
+best_params={}
+
+
+for neurons in param_grid["neurons"]:
+    for activation in param_grid["activation"]:
+        for optimizer in param_grid["optimizer"]:
+            for batch_size in param_grid["batch_size"]:
+                for epochs in param_grid["epochs"]:
+                    print(f"Training model: neurons={neurons}, activation={activation}, optimizer={optimizer}")
+                    # Build model
+                    model = keras.Sequential([
+                        layers.Dense(neurons, activation=activation, input_shape=(784,)),
+                        layers.Dense(64, activation=activation),
+                        layers.Dense(10, activation='softmax')
+                    ])
+                    model.compile(optimizer=optimizer,
+                                  loss='sparse_categorical_crossentropy',
+                                  metrics=['accuracy'])
+                    # Train
+                    model.fit(X_train, y_train_split, epochs=epochs, batch_size=batch_size, verbose=0)
+                    
+                    # Validate
+                    val_loss, val_acc = model.evaluate(X_val, y_val_split, verbose=0)
+                    print(f"Validation Accuracy: {val_acc:.4f}")
+                    
+                    if val_acc > best_acc:
+                        best_acc = val_acc
+                        best_params = {
+                            "neurons": neurons,
+                            "activation": activation,
+                            "optimizer": optimizer,
+                            "batch_size": batch_size,
+                            "epochs": epochs
+                        }
+
+print("\n Best Hypreparameters: ")
+print(best_params)
+print(f"Best Validation Accuracy: {best_acc:4f}")
+---------------------------------------------------------------------------
+
+practical 3
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+import matplotlib.pyplot as plt
+
+(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+
+# Class labels for CIFAR-10
+class_labels = ['airplane', 'automobile', 'bird', 'cat', 'deer',
+                'dog', 'frog', 'horse', 'ship', 'truck']
+
+# Define the CNN model architecture with padding
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', padding='same',strides=2, input_shape=(32, 32, 3)),
+    MaxPooling2D((2, 2)),
+    Conv2D(64, (3, 3), activation='relu', padding='same',strides=2),
+    MaxPooling2D((2, 2)),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dense(10, activation='softmax')
+])
+
+# Compile the model
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Train the model
+model.fit(x_train, y_train, epochs=5, batch_size=64)
+
+# Evaluate the model on test data
+test_loss, test_acc = model.evaluate(x_test, y_test)
+print(f"Test accuracy: {test_acc}")
+
+# Choose a single image from the test set
+index = 50  # Replace with the index of the image you want to use
+single_image = x_test[index:index+1]
+
+# Get the predicted probabilities for the single image
+predicted_probabilities = model.predict(single_image)
+
+# Get the predicted class (index with highest probability)
+predicted_class = np.argmax(predicted_probabilities)
+predicted_label = class_labels[predicted_class]
+
+# Display the input image
+plt.imshow(single_image.reshape(32, 32, 3))
+plt.title(f"Predicted Class: {predicted_label}")
+plt.axis('off')
+plt.show()
+
+# Display the predicted probabilities
+print("Predicted Probabilities:", predicted_probabilities)
+
+
+------------------------------------------------------------
+practical 5
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D,MaxPooling2D,Flatten,Dense
+import matplotlib.pyplot as plt
+
+# Load and preprocess the MNIST dataset
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+print(x_train.shape)
+x_train = x_train / 255.0
+x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
+x_test = x_test / 255.0
+x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)  # Reshape test set too
+
+# Define the CNN model architecture with strides and padding
+model = Sequential([
+    Conv2D(32, (3, 3), strides=(1, 1), padding='same', activation='relu', input_shape=(28, 28, 1)),
+    MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
+    
+    Conv2D(64, (3, 3), strides=(1, 1), padding='same', activation='relu'),
+    MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same'),
+
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dense(10, activation='softmax')
+])
+
+# Compile the model
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Train the model using the training data
+model.fit(x_train, y_train, epochs=5, batch_size=64, validation_data=(x_test, y_test))
+
+# Choose a single image from the test set
+index = 7  # Replace with the index of the image you want to use
+single_image = x_test[index]
+input_image = np.expand_dims(single_image, axis=0)  # Expand dimensions for model input
+
+# Get the predicted probabilities for the single image
+predicted_probabilities = model.predict(input_image)
+
+
+# Get the predicted probabilities for the single image
+predicted_probabilities = model.predict(input_image)
+# Display the input image
+plt.imshow(single_image.squeeze(), cmap='gray')  # Use squeeze() to remove extra dimension
+plt.title('Input Image')
+plt.axis('off')
+plt.show()
+
+# Display the predicted probabilities
+print("Predicted Probabilities:", predicted_probabilities)
+# Get the predicted class (index with highest probability)
+predicted_class = np.argmax(predicted_probabilities)
+print("Predicted Class:", predicted_class)
+
+---------------------------------------------------------------
+practical 4
+
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D,MaxPooling2D,Flatten,Dense
+import matplotlib.pyplot as plt
+
+(X_train,y_train),(X_test,y_test)=mnist.load_data()
+print(X_train.shape)
+X_train=X_train/255.0
+X_train=X_train.reshape(X_train.shape[0],28,28,1)
+
+model=Sequential([ Conv2D(32,(3,3),activation='relu',input_shape=(28,28,1)), MaxPooling2D((2,2)), Conv2D(64,(3,3),activation='relu'), MaxPooling2D((2,2)), Flatten(), Dense(128,activation='relu'), Dense(10,activation='softmax')
+
+])
+
+model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+
+model.fit(X_train,y_train,epochs=5)
+
+index=0
+single_image=X_test[index]
+input_image=np.expand_dims(single_image,axis=0)
+predicted_probablities=model.predict(input_image)
+
+plt.imshow(single_image,cmap='gray')
+plt.title('Input Image')
+plt.axis('off')
+plt.show()
+
+--------------------------------------------------------------------------
+practical 6
+
+import tensorflow as tf
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.applications.resnet50 import preprocess_input,decode_predictions
+from tensorflow.keras.preprocessing import image
+import numpy as np
+import matplotlib.pyplot as plt
+
+model=ResNet50(weights='imagenet')
+
+img_path='fish.PNG'
+img=image.load_img(img_path,target_size=(224,224))
+img_array=image.img_to_array(img)
+img_array=np.expand_dims(img_array,axis=0)
+img_array=preprocess_input(img_array)
+
+
+# Step 3: Run inference on the preprocessed image
+predictions = model.predict(img_array)
+
+# Decode the predictions (returns the top 5 predicted classes)
+decoded_predictions = decode_predictions(predictions, top=5)
+
+# Step 4: Display the top 5 predictions
+print('Top 5 predictions:')
+for i, (imagenet_id, label, score) in enumerate(decoded_predictions[0]):
+    print(f'{i+1}: {label} ({score * 100:.2f}%)')
+
+# Step 5: Display the input image and prediction
+plt.imshow(image.load_img(img_path, target_size=(224, 224)))
+plt.title(f"Predicted: {decoded_predictions[0][0][1]} with {decoded_predictions[0][0][2] * 100:.2f}% confidence")
+plt.axis('off')
+plt.show()
+
+
+-------------------------------------------------------------------------
+Practical No 7
+
+import torch
+import torch.nn as nn
+import torchvision
+import torchvision.transforms as transforms
+from torchvision.utils import make_grid
+import matplotlib.pyplot as plt
+
+# Setup
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+z_dim = 100
+image_size = 28
+
+# Data
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+])
+dataset = torchvision.datasets.MNIST(root='./data', train=True, transform=transform, download=True)
+loader = torch.utils.data.DataLoader(dataset, batch_size=128, shuffle=True)
+
+
+# Generator
+class Generator(nn.Module):
+    def __init__(self, z_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.ConvTranspose2d(z_dim, 256, 7, 1, 0, bias=False),
+            nn.BatchNorm2d(256),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(256, 128, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(128),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(128, 1, 4, 2, 1, bias=False),
+            nn.Tanh()
+        )
+    def forward(self, z):
+        return self.net(z)
+
+# Discriminator
+class Discriminator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(1, 64, 4, 2, 1, bias=False),
+            nn.LeakyReLU(0.2),
+            nn.Conv2d(64, 128, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(128),
+            nn.LeakyReLU(0.2),
+            nn.Flatten(),
+            nn.Linear(128 * 7 * 7, 1),
+            nn.Sigmoid()
+        )
+    def forward(self, x):
+        return self.net(x)
+
+
+# Initialize models
+G = Generator(z_dim).to(device)
+D = Discriminator().to(device)
+
+# Optimizers and Loss
+loss_fn = nn.BCELoss()
+opt_G = torch.optim.Adam(G.parameters(), lr=2e-4, betas=(0.5, 0.999))
+opt_D = torch.optim.Adam(D.parameters(), lr=2e-4, betas=(0.5, 0.999))
+
+
+
+# Visualization helper
+def show_generated_images(images, scores, title):
+    images = images.cpu().detach()
+    scores = scores.cpu().detach().numpy().flatten()
+    fig, axes = plt.subplots(4, 4, figsize=(8, 8))
+    for i, ax in enumerate(axes.flatten()):
+        ax.imshow(images[i][0], cmap='gray')
+        ax.set_title(f"D: {scores[i]:.2f}")
+        ax.axis('off')
+    plt.suptitle(title)
+    plt.tight_layout()
+    plt.show()
+
+# Training Loop
+for epoch in range(10):  # More epochs = clearer images
+    for i, (real_imgs, _) in enumerate(loader):
+        real_imgs = real_imgs.to(device)
+        batch_size = real_imgs.size(0)
+        real_labels = torch.ones(batch_size, 1).to(device)
+        fake_labels = torch.zeros(batch_size, 1).to(device)
+
+        # === Train Discriminator ===
+        z = torch.randn(batch_size, z_dim, 1, 1).to(device)
+        fake_imgs = G(z)
+
+        D_real = D(real_imgs)
+        D_fake = D(fake_imgs.detach())
+        loss_D = loss_fn(D_real, real_labels) + loss_fn(D_fake, fake_labels)
+
+        opt_D.zero_grad()
+        loss_D.backward()
+        opt_D.step()
+
+        # === Train Generator ===
+        z = torch.randn(batch_size, z_dim, 1, 1).to(device)
+        fake_imgs = G(z)
+        D_fake = D(fake_imgs)
+        loss_G = loss_fn(D_fake, real_labels)  # Try to fool D
+
+        opt_G.zero_grad()
+        loss_G.backward()
+        opt_G.step()
+
+        # === Visualize every 200 steps ===
+        if i % 200 == 0:
+            test_z = torch.randn(16, z_dim, 1, 1).to(device)
+            test_imgs = G(test_z)
+            test_scores = D(test_imgs)
+            print(f"Epoch {epoch} Step {i} | D Loss: {loss_D.item():.4f} | G Loss: {loss_G.item():.4f}")
+            show_generated_images(test_imgs, test_scores, title=f"Epoch {epoch}, Step {i}")
+
+
+------------------------------------------------------------------------
+Practical 8
+
+import numpy as np
+import matplotlib.pyplot as plt
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import SimpleRNN,Dense
+from sklearn.preprocessing import MinMaxScaler
+
+np.random.seed(42)
+days=200
+rainfall=np.sin(np.linspace(0,20,days))+np.random.normal(0,0.3,days)
+rainfall=rainfall.reshape(-1,1)
+
+scaler=MinMaxScaler()
+rainfall_scaled=scaler.fit_transform(rainfall)
+
+def create_sequences(data,step=4):
+    X,y=[],[]
+    for i in range(len(data)-step):
+        X.append(data[i:i+step])
+        y.append(data[i+step])
+    return np.array(X),np.array(y)
+
+X,y=create_sequences(rainfall_scaled,step=4)
+
+X=X.reshape((X.shape[0],X.shape[1],1))
+
+split=int(len(X)*0.8)
+X_train,X_test=X[:split],X[split:]
+y_train,y_test=y[:split],y[split:]
+
+
+
+model= Sequential([
+    SimpleRNN(10,activation='tanh',input_shape=(4,1)),
+    Dense(1)
+])
+model.compile(optimizer='adam',loss='mse')
+model.summary()
+
+
+history=model.fit(X_train,y_train,epochs=100,verbose=0)
+
+
+y_pred=model.predict(X_test)
+y_pred_rescaled=scaler.inverse_transform(y_pred)
+y_test_rescaled=scaler.inverse_transform(y_test)
+
+
+
+plt.figure(figsize=(10,5))
+plt.plot(y_test_rescaled,label='Actual Rainfall')
+plt.plot(y_pred_rescaled,label='Predicted Rainfall')
+plt.title('Rainfall Predication (4-to-1 RNN)')
+plt.xlabel("time")
+plt.ylabel("Rainfall")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+from sklearn.metrics import mean_squared_error,mean_absolute_error,r2_score
+mae=mean_absolute_error(y_test_rescaled,y_pred_rescaled)
+mse=mean_squared_error(y_test_rescaled,y_pred_rescaled)
+rmse=np.sqrt(mse)
+r2=r2_score(y_test_rescaled,y_pred_rescaled)
+print(f"MAE:{mae:.4f}")
+print(f"MSE:{mse:.4f}")
+print(f"RMSE:{rmse:.4f}")
+print(f"R2:{r2:.4f}")
+
+# Show sample predictions
+print("\n Sample Predictions:")
+for i in range(10):
+    actual = y_test_rescaled[i][0]
+    predicted = y_pred_rescaled[i][0]
+    print(f"Day {i+1}: Actual = {actual:.3f}, Predicted = {predicted:.3f}")
+
+
+print("\n Sample Sequence-wise Predictions (Previous 4 Days → Predicted Day 5):\n")
+for i in range(10):
+    # Rescale previous 4 input days back to original rainfall values
+    prev_days_scaled = X_test[i].reshape(-1, 1)  # shape (4, 1)
+    prev_days_original = scaler.inverse_transform(prev_days_scaled).flatten()
+    # Get prediction and actual
+    predicted = y_pred_rescaled[i][0]
+    actual = y_test_rescaled[i][0]
+    # Display
+    print(f"Day {i+1}:")
+    print(f"  Previous 4 Days Rainfall: {prev_days_original.round(3)}")
+    print(f"  Predicted Day 5 Rainfall: {predicted:.3f}")
+    print(f"  Actual Day 5 Rainfall   : {actual:.3f}")
+    print("-" * 60)
+
+
+
+--------------------------------------------------------------------------------
+Practical 9
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tensorflow.keras.datasets import imdb
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
+from sklearn.metrics import classification_report, confusion_matrix
+
+
+# Step 2: Load Dataset
+num_words = 10000  # use top 10,000 frequent words
+(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=num_words)
+
+num_words = 10000  # use top 10,000 frequent words
+(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=num_words)
+
+# Step 3: EDA - Explore the Data
+print("Number of training samples:", len(X_train))
+print("Number of test samples:", len(X_test))
+
+
+# Show first review (as integers)
+print("Sample review (word IDs):", X_train[0])
+print("Sample sentiment:", y_train[0])
+
+
+# Length distribution of reviews
+review_lengths = [len(x) for x in X_train]
+plt.figure(figsize=(8, 4))
+sns.histplot(review_lengths, bins=50, kde=True)
+plt.title("Distribution of Review Lengths")
+plt.xlabel("Review Length")
+plt.ylabel("Frequency")
+plt.grid(True)
+plt.show()
+
+maxlen=200
+X_train_padded=pad_sequences(X_train,maxlen=maxlen)
+X_test_padded=pad_sequences(X_test,maxlen=maxlen)
+
+
+# Step 5: Build LSTM Model
+model = Sequential([
+    Embedding(input_dim=num_words, output_dim=128, input_length=maxlen),
+    LSTM(128),
+    Dropout(0.5),
+    Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.summary()
+
+
+history = model.fit(
+    X_train_padded, y_train,
+    validation_split=0.2,
+    epochs=3,
+    batch_size=128,
+    verbose=1
+)
+
+plt.figure(figsize=(12, 5))
+plt.subplot(1, 2, 1)
+plt.plot(history.history['accuracy'], label="Train")
+plt.plot(history.history['val_accuracy'], label="Val")
+plt.title("Accuracy over Epochs")
+plt.legend()
+plt.grid(True)
+
+
+plt.subplot(1, 2, 2)
+plt.plot(history.history['loss'], label="Train")
+plt.plot(history.history['val_loss'], label="Val")
+plt.title("Loss over Epochs")
+plt.legend()
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+
+# Step 8: Evaluate on Test Set
+loss, acc = model.evaluate(X_test_padded, y_test, verbose=0)
+print(f"Test Accuracy: {acc:.4f}")
+
+#  Step 9: Classification Report
+y_pred = (model.predict(X_test_padded) > 0.5).astype("int32")
+print(classification_report(y_test, y_pred))
+
+word_index = imdb.get_word_index()
+index_to_word = {index + 3: word for word, index in word_index.items()}
+index_to_word[0] = "<PAD>"
+index_to_word[1] = "<START>"
+index_to_word[2] = "<UNK>"
+index_to_word[3] = "<UNUSED>"
+
+
+def decode_review(encoded_review):
+    return " ".join([index_to_word.get(i, "?") for i in encoded_review])
+print("\n Sample Predictions:\n")
+for i in range(5):
+    review = decode_review(X_test[i])
+    prediction = "Positive" if y_pred[i][0] == 1 else "Negative"
+    actual = "Positive" if y_test[i] == 1 else "Negative"
+    print(f"Review {i+1}:")
+    print(f"Text: {review[:300]}...")
+    print(f"Prediction: {prediction} | Actual: {actual}")
+    print("-" * 80)
+
+
+--------------------------------------------------------
+Pratical 10
+import cv2
+image=cv2.imread('furit.PNG')
+if image is not None:
+    cv2.imshow('Image',image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+else:
+    print("Image not found or unsupported format")
+
+
+import cv2
+
+# Read an image
+image = cv2.imread('furit.PNG')
+
+# Display the image in a window
+cv2.imshow('Image', image)
+
+# Write the image to a file
+cv2.imwrite('output_image1.png', image)
+
+# Wait for a key press and close the window
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+import cv2
+
+# Read an image
+image = cv2.imread('output_image.png')
+
+# Convert to grayscale
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# Display the original and grayscale images
+cv2.imshow('Original Image', image)
+cv2.imshow('Grayscale Image', gray_image)
+
+# Wait for a key press and close the windows
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+
+import cv2
+
+# Access the webcam
+cap = cv2.VideoCapture(0)  # Use 0 for the default camera, change if using an external camera
+
+# Check if the camera opened successfully
+if not cap.isOpened():
+    print("Cannot open camera")
+    exit()
+
+# Capture a frame
+ret, frame = cap.read()
+
+# If frame is captured successfully, save it
+if ret:
+    cv2.imwrite('captured_image.jpg', frame)
+    print("Image captured and saved as 'captured_image.jpg'")
+else:
+    print("Failed to capture image")
+
+# Release the camera
+cap.release()
